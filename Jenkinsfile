@@ -39,19 +39,100 @@
 //         }
 //     }
 // }
+
+
+//----------------------------- Revised Jenkinsfile -----------------------------
+// pipeline {
+//     agent any
+
+//     environment {
+//         IMAGE_NAME = "cicd-pipeline-image"
+//         CONTAINER_NAME = "cicd-pipeline-container"
+//         VERSION = "${BUILD_NUMBER}"
+//     }
+
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 echo "Source code checked out"
+//             }
+//         }
+
+//         stage('Build Docker Image') {
+//             steps {
+//                 bat """
+//                 docker build -t %IMAGE_NAME%:%VERSION% -t %IMAGE_NAME%:latest .
+//                 """
+//             }
+//         }
+
+//         stage('Deploy Container') {
+//             steps {
+//                 bat """
+//                 docker stop %CONTAINER_NAME% 2>nul
+//                 docker rm %CONTAINER_NAME% 2>nul
+//                 docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%:%VERSION%
+//                 """
+//             }
+//         }
+
+//         stage('Health Check') {
+//             steps {
+//                 bat """
+//                  timeout /t 5 /nobreak
+//                  curl -f http://localhost:5000 || exit 1
+//                 """
+//     }
+// }
+
+//     }
+
+//     post {
+//         success {
+//             echo "✅ Deployed Build Version: %VERSION%"
+//         }
+//     }
+// }
+
+
+//============================= Revised Jenkinsfile with Tests =========================
+
 pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "cicd-pipeline-image"
+        IMAGE_NAME     = "cicd-pipeline-image"
         CONTAINER_NAME = "cicd-pipeline-container"
-        VERSION = "${BUILD_NUMBER}"
+        VERSION        = "${BUILD_NUMBER}"
+        PORT           = "5000"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo "Source code checked out"
+                // Jenkins has already done the git checkout at this point
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat """
+                python -m pip install --upgrade pip
+                python -m pip install -r requirements.txt
+                """
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                bat "flake8 ."
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat "pytest"
             }
         }
 
@@ -68,7 +149,11 @@ pipeline {
                 bat """
                 docker stop %CONTAINER_NAME% 2>nul
                 docker rm %CONTAINER_NAME% 2>nul
-                docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%:%VERSION%
+                docker run -d ^
+                    -e BUILD_VERSION=%VERSION% ^
+                    -p %PORT%:%PORT% ^
+                    --name %CONTAINER_NAME% ^
+                    %IMAGE_NAME%:%VERSION%
                 """
             }
         }
@@ -76,17 +161,19 @@ pipeline {
         stage('Health Check') {
             steps {
                 bat """
-                 timeout /t 5 /nobreak
-                 curl -f http://localhost:5000 || exit 1
+                timeout /t 5 /nobreak
+                curl -f http://localhost:%PORT%/health || exit 1
                 """
-    }
-}
-
+            }
+        }
     }
 
     post {
         success {
-            echo "✅ Deployed Build Version: %VERSION%"
+            echo "✅ Pipeline SUCCESS. Deployed Build Version: %VERSION%"
+        }
+        failure {
+            echo "❌ Pipeline FAILED. Check logs above."
         }
     }
 }

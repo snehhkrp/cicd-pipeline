@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>CI/CD Pipeline Demo</title>
@@ -22,5 +22,71 @@
             Change this text, push to Git → Jenkins will redeploy automatically.
         </p>
     </div>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CI/CD Pipeline Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script defer src="/static/app.js"></script>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">🚀 CI/CD LAB</div>
+    <div class="nav-right">
+        <span id="buildVersion">Build: {{ build_version }}</span>
+        <button onclick="refreshStatus()">🔄 Refresh</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h1>Jenkins CI/CD Pipeline</h1>
+        <p class="subtitle">Live Deployment Monitor</p>
+        <p class="note">Build version: {{ build_version }}</p>
+
+        
+        <div class="status-box" id="statusBox">
+            <div class="dot" id="statusDot"></div>
+            <span id="statusText">Checking status...</span>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <h3>Source</h3>
+                <p>GitHub</p>
+            </div>
+            <div class="info-item">
+                <h3>CI Server</h3>
+                <p>Jenkins</p>
+            </div>
+            <div class="info-item">
+                <h3>Container</h3>
+                <p>Docker</p>
+            </div>
+            <div class="info-item">
+                <h3>Build Version</h3>
+                <p id="versionText">{{ build_version }}</p>
+            </div>
+        </div>
+
+        <div class="log-box">
+            <h3>Deployment Test</h3>
+            <p>Edit this UI → Commit → Push → Jenkins Deploys → Refresh page</p>
+            <textarea id="logArea" readonly>Waiting for health check...</textarea>
+        </div>
+
+        <div class="footer">
+            <p>Automated CI/CD Deployment Demo</p>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
