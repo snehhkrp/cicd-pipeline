@@ -40,14 +40,13 @@
 //     }
 // }
 
-
-
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = "cicd-pipeline-image"
         CONTAINER_NAME = "cicd-pipeline-container"
+        VERSION = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -59,7 +58,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %IMAGE_NAME% ."
+                bat """
+                docker build -t %IMAGE_NAME%:%VERSION% -t %IMAGE_NAME%:latest .
+                """
             }
         }
 
@@ -68,7 +69,7 @@ pipeline {
                 bat """
                 docker stop %CONTAINER_NAME% 2>nul
                 docker rm %CONTAINER_NAME% 2>nul
-                docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%
+                docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%:%VERSION%
                 """
             }
         }
@@ -76,10 +77,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ UI deployed successfully via CI/CD"
-        }
-        failure {
-            echo "❌ Pipeline failed"
+            echo "✅ Deployed Build Version: %VERSION%"
         }
     }
 }
