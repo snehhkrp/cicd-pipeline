@@ -1,0 +1,28 @@
+body {
+    background: linear-gradient(to right, #141e30, #243b55);
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+    padding-top: 100px;
+}
+
+.card {
+    background: rgba(0, 0, 0, 0.6);
+    width: 500px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 15px black;
+}
+
+.status {
+    color: #00ff99;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.note {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #ffcc00;
+}
