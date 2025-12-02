@@ -72,6 +72,16 @@ pipeline {
                 """
             }
         }
+
+        stage('Health Check') {
+            steps {
+                bat """
+                 timeout /t 5 /nobreak
+                 curl -f http://localhost:5000 || exit 1
+                """
+    }
+}
+
     }
 
     post {
