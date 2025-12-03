@@ -133,7 +133,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 bat """
-                pytest || exit 0
+                pytest 
                 """
             }
         }
