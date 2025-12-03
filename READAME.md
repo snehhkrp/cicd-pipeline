@@ -45,3 +45,20 @@ cicd-pipeline/
 │   └─ style.css
 └─ tests/
     └─ test_app.py
+
+
+# CI/CD Pipeline — Task Tracker (MySQL)
+
+Simple Flask app with MySQL backend.
+Used to demonstrate Jenkins CI/CD + Docker.
+
+## Run locally
+
+1. Ensure MySQL is running and has DB `cicd`.
+2. Create table:
+   ```sql
+   CREATE TABLE tasks (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     title VARCHAR(255) NOT NULL,
+     status VARCHAR(50) NOT NULL DEFAULT 'pending'
+   );

@@ -1,6 +1,6 @@
 flask
-gunicorn
+mysql-connector-python
 pytest
 flake8
 requests
-mysql-connector-python
+gunicorn

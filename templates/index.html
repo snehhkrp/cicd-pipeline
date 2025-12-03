@@ -92,75 +92,71 @@
 </html> -->
 
 <!--  with db    -->
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CI/CD Pipeline Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css" />
+  <meta charset="utf-8">
+  <title>Task Tracker (DB)</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <div class="wrap">
+    <h1>Task Tracker</h1>
+    <p>Simple tasks stored in MySQL — demo for CI/CD.</p>
 
-    <div class="container">
-        <h1>🚀 CI/CD Demo Dashboard</h1>
-        <p class="subtitle">Live MySQL Data + Flask API + Jenkins Pipeline</p>
-
-        <button id="refreshBtn" class="btn">🔄 Refresh Tasks</button>
-        <button id="addBtn" class="btn btn-green">➕ Add Task</button>
-
-        <table class="task-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="taskBody"></tbody>
-        </table>
+    <div class="controls">
+      <input id="title" placeholder="New task title" />
+      <button id="add">Add Task</button>
+      <button id="refresh">Refresh</button>
     </div>
 
-    <script>
-        async function loadTasks() {
-            const res = await fetch("/tasks");
-            const data = await res.json();
+    <table id="tasks">
+      <thead>
+        <tr><th>ID</th><th>Title</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for t in tasks %}
+        <tr>
+          <td>{{ t.id }}</td>
+          <td>{{ t.title }}</td>
+          <td>{{ t.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-            const tbody = document.getElementById("taskBody");
-            tbody.innerHTML = "";
+<script>
+async function loadTasks() {
+  const res = await fetch("/tasks");
+  const data = await res.json();
+  const tbody = document.querySelector("#tasks tbody");
+  tbody.innerHTML = "";
+  data.forEach(t => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${t.id}</td><td>${t.title}</td><td>${t.status}</td>`;
+    tbody.appendChild(tr);
+  });
+}
 
-            data.forEach(task => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${task.id}</td>
-                    <td>${task.title}</td>
-                    <td>
-                        <span class="badge ${task.status}">
-                            ${task.status}
-                        </span>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+document.getElementById("add").onclick = async () => {
+  const title = document.getElementById("title").value.trim();
+  if (!title) {
+    alert("Enter a title");
+    return;
+  }
+  await fetch("/tasks", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({title})
+  });
+  document.getElementById("title").value = "";
+  loadTasks();
+};
 
-        document.getElementById("refreshBtn").onclick = loadTasks;
+document.getElementById("refresh").onclick = loadTasks;
 
-        document.getElementById("addBtn").onclick = async () => {
-            const title = prompt("Enter task name:");
-            if (!title) return;
-
-            await fetch("/tasks", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title })
-            });
-
-            loadTasks();
-        };
-
-        loadTasks();
-    </script>
-
+window.onload = loadTasks;
+</script>
 </body>
 </html>

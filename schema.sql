@@ -1,8 +1,5 @@
-CREATE TABLE IF NOT EXISTS builds (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    build_number INT,
-    status VARCHAR(30),
-    duration_sec INT,
-    timestamp BIGINT,
-    job_name VARCHAR(100)
+CREATE TABLE IF NOT EXISTS tasks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'pending'
 );

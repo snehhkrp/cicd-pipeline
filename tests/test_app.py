@@ -22,13 +22,27 @@
 #     data = response.get_json()
 #     assert data["status"] == "ok"
 #     assert "build_version" in data
-
-
 # ====================================================
+from app import app
 
-import app
 
-def test_home():
-    c = app.app.test_client()
-    r = c.get("/")
-    assert r.status_code == 200
+def test_home_status_code():
+    client = app.test_client()
+    resp = client.get("/")
+    assert resp.status_code == 200
+
+
+def test_home_contains_html():
+    client = app.test_client()
+    resp = client.get("/")
+    body = resp.data.decode("utf-8")
+    assert "<h1" in body or "Tasks" in body
+
+
+def test_health_endpoint():
+    client = app.test_client()
+    resp = client.get("/health")
+
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["status"] == "ok"

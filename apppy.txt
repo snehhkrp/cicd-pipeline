@@ -1,0 +1,40 @@
+# # from flask import Flask, render_template
+
+# # app = Flask(__name__)
+
+# # @app.route("/")
+# # def home():
+# #     return render_template("index.html")
+
+# # if __name__ == "__main__":
+# #     app.run(host="0.0.0.0", port=5000)
+
+
+# import os
+# from flask import Flask, render_template, jsonify
+
+# app = Flask(__name__)
+
+# # Read build version from env (set by Jenkins)
+# BUILD_VERSION = os.getenv("BUILD_VERSION", "dev-local")
+
+
+# @app.route("/")
+# def home():
+#     return render_template("index.html", build_version=BUILD_VERSION)
+
+
+# @app.route("/health")
+# def health():
+#     """
+#     Simple health check endpoint for CI/CD and monitoring.
+#     """
+#     return jsonify(
+#         status="ok",
+#         build_version=BUILD_VERSION
+#     ), 200
+
+
+# if __name__ == "__main__":
+#     # Local dev only; in Docker we use gunicorn
+#     app.run(host="0.0.0.0", port=5000)
