@@ -1,6 +1,10 @@
 import json
 
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 import app
+
 
 
 def test_api_get_tasks(monkeypatch):
