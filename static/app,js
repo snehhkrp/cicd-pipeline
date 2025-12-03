@@ -1,31 +1,46 @@
+// async function refreshStatus() {
+//     const statusText = document.getElementById("statusText");
+//     const dot = document.getElementById("statusDot");
+//     const logArea = document.getElementById("logArea");
+
+//     statusText.innerText = "Checking...";
+//     dot.style.background = "orange";
+
+//     try {
+//         const res = await fetch("/health");
+//         const data = await res.json();
+
+//         if (res.ok && data.status === "ok") {
+//             statusText.innerText = "Application Healthy";
+//             dot.style.background = "#22c55e";
+
+//             logArea.value = 
+//                 "Health Check: OK\n" +
+//                 "Build Version: " + data.build_version + "\n" +
+//                 "Last Checked: " + new Date().toLocaleTimeString();
+//         } else {
+//             throw new Error("Unhealthy");
+//         }
+//     } catch (err) {
+//         statusText.innerText = "Application Down";
+//         dot.style.background = "red";
+//         logArea.value = "Health Check FAILED at " + new Date().toLocaleTimeString();
+//     }
+// }
+
+// window.onload = refreshStatus;
+
+
+//new
+
 async function refreshStatus() {
-    const statusText = document.getElementById("statusText");
-    const dot = document.getElementById("statusDot");
-    const logArea = document.getElementById("logArea");
-
-    statusText.innerText = "Checking...";
-    dot.style.background = "orange";
-
+    const log = document.getElementById("statusText");
+    log.innerText = "Refreshing...";
     try {
         const res = await fetch("/health");
         const data = await res.json();
-
-        if (res.ok && data.status === "ok") {
-            statusText.innerText = "Application Healthy";
-            dot.style.background = "#22c55e";
-
-            logArea.value = 
-                "Health Check: OK\n" +
-                "Build Version: " + data.build_version + "\n" +
-                "Last Checked: " + new Date().toLocaleTimeString();
-        } else {
-            throw new Error("Unhealthy");
-        }
-    } catch (err) {
-        statusText.innerText = "Application Down";
-        dot.style.background = "red";
-        logArea.value = "Health Check FAILED at " + new Date().toLocaleTimeString();
+        log.innerText = "Status: " + data.status + " (Build " + data.build_version + ")";
+    } catch {
+        log.innerText = "Error fetching health";
     }
 }
-
-window.onload = refreshStatus;
