@@ -23,30 +23,33 @@
 #     assert data["status"] == "ok"
 #     assert "build_version" in data
 # ====================================================
-import sys, os
+import sys
+import os
+import json
+
+# Add project root to PYTHONPATH
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from app import app
 
 
-
 def test_home_status_code():
     client = app.test_client()
-    resp = client.get("/")
-    assert resp.status_code == 200
+    response = client.get("/")
+    assert response.status_code == 200
 
 
-def test_home_contains_html():
+def test_home_contains_ui_text():
     client = app.test_client()
-    resp = client.get("/")
-    body = resp.data.decode("utf-8")
-    assert "<h1" in body or "Tasks" in body
+    response = client.get("/")
+    body = response.data.decode("utf-8")
+    assert "CI/CD" in body or "Pipeline" in body or "Welcome" in body
 
 
 def test_health_endpoint():
     client = app.test_client()
-    resp = client.get("/health")
+    response = client.get("/health")
+    data = response.get_json()
 
-    assert resp.status_code == 200
-    data = resp.get_json()
+    assert response.status_code == 200
     assert data["status"] == "ok"

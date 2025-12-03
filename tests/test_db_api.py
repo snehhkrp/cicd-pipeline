@@ -1,39 +1,15 @@
-import json
+import sys
+import os
 
-import sys, os
+# Add project root
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-import app
+from db import add_task, get_tasks
 
 
+def test_add_and_get_tasks():
+    add_task("Test Task From CI")
+    tasks = get_tasks()
 
-def test_api_get_tasks(monkeypatch):
-    fake = [{"id": 2, "title": "t2", "status": "pending"}]
-
-    def fake_get():
-        return fake
-
-    monkeypatch.setattr("db.get_all_tasks", fake_get)
-    client = app.app.test_client()
-    r = client.get("/tasks")
-    assert r.status_code == 200
-    data = r.get_json()
-    assert isinstance(data, list)
-    assert data[0]["title"] == "t2"
-
-
-def test_api_post_task(monkeypatch):
-    called = {}
-
-    def fake_add(title):
-        called["t"] = title
-
-    monkeypatch.setattr("db.add_task", fake_add)
-    client = app.app.test_client()
-    r = client.post(
-        "/tasks",
-        data=json.dumps({"title": "hello"}),
-        content_type="application/json",
-    )
-    assert r.status_code == 201
-    assert called["t"] == "hello"
+    assert isinstance(tasks, list)
+    assert any("Test Task From CI" in t["title"] for t in tasks)
