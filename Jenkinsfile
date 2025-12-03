@@ -133,10 +133,12 @@ pipeline {
         stage('Run Tests') {
             steps {
                 bat """
-                pytest 
-                """
-            }
-        }
+                    set PYTHONPATH=%CD%
+                     pytest
+                    """
+                }
+}
+
 
         stage('Build Docker Image') {
             steps {
