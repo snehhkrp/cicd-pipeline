@@ -1,4 +1,5 @@
-"""Database helper for Task Tracker.
+"""
+Database helper for Task Tracker.
 
 Provides simple functions that the app imports directly.
 This module connects to MySQL using environment variables.
@@ -11,11 +12,13 @@ For Docker runs:
 """
 
 import os
+from typing import List, Dict
+
 import mysql.connector
 from mysql.connector import Error
 
 
-def _db_config():
+def _db_config() -> dict:
     """Return DB connection parameters."""
     if os.getenv("DOCKER_ENV") == "true":
         host = "host.docker.internal"
@@ -41,10 +44,10 @@ def _get_conn():
     )
 
 
-def get_all_tasks():
+def get_tasks() -> List[Dict]:
     """Return list of tasks as dictionaries.
 
-    If DB is unavailable, return empty list to keep UI usable.
+    If DB is unavailable, return an empty list to keep the UI usable.
     """
     try:
         conn = _get_conn()
@@ -58,14 +61,24 @@ def get_all_tasks():
         return []
 
 
-def add_task(title):
+# Backwards-compatible alias (some old code called get_all_tasks)
+def get_all_tasks() -> List[Dict]:
+    """Alias to get_tasks for backward compatibility."""
+    return get_tasks()
+
+
+def add_task(title: str) -> None:
     """Insert a new task with status 'pending'."""
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO tasks (title, status) VALUES (%s, %s)",
-        (title, "pending"),
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        conn = _get_conn()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO tasks (title, status) VALUES (%s, %s)",
+            (title, "pending"),
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Error:
+        # swallow DB error to keep UI usable; in prod you would log this
+        return
