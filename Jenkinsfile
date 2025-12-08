@@ -185,146 +185,72 @@
 
 // //============================= Revised Jenkinsfile with Tests =========================
 
-// pipeline {
-//   agent any
-
-//   environment {
-//     BUILD_VERSION = "${env.BUILD_NUMBER}"
-//     DOCKER_ENV = "true"
-//   }
-
-//   stages {
-//     stage('Checkout') {
-//       steps {
-//         checkout scm
-//       }
-//     }
-
-//     stage('Install') {
-//       steps {
-//         bat 'python -m pip install --upgrade pip'
-//         bat 'python -m pip install -r requirements.txt'
-//       }
-//     }
-
-//     stage('Lint') {
-//       steps {
-//         bat 'flake8 .'
-//       }
-//     }
-
-//     stage('Tests') {
-//       steps {
-//         bat 'pytest -q'
-//       }
-//     }
-
-//     stage('Build Image') {
-//       steps {
-//         bat 'docker build -t cicd-db-app .'
-//       }
-//     }
-
-//     stage('Deploy') {
-//       steps {
-//         bat 'docker stop cicd-db-app 2>nul || exit 0'
-//         bat 'docker rm cicd-db-app 2>nul || exit 0'
-//         bat """
-//           docker run -d -p 5000:5000 ^
-//             --name cicd-db-app ^
-//             -e DOCKER_ENV=true ^
-//             -e MYSQL_HOST=host.docker.internal ^
-//             -e MYSQL_USER=root ^
-//             -e MYSQL_PASSWORD=pass123 ^
-//             -e MYSQL_DB=cicd ^
-//             cicd-db-app
-//           """
-//       }
-//     }
-
-//     stage('Health Check') {
-//       steps {
-//         powershell '(Invoke-RestMethod http://localhost:5000/health) | ConvertTo-Json'
-//       }
-//     }
-//   }
-
-//   post {
-//     success { echo 'Pipeline success' }
-//     failure { echo 'Pipeline failed' }
-//   }
-// }
 pipeline {
-    agent any
+  agent any
 
-    stages {
+  environment {
+    BUILD_VERSION = "${env.BUILD_NUMBER}"
+    DOCKER_ENV = "true"
+  }
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Install') {
-            steps {
-                bat "python -m pip install --upgrade pip"
-                bat "python -m pip install -r requirements.txt"
-            }
-        }
-
-        stage('Lint') {
-            steps {
-                bat "flake8 ."
-            }
-        }
-
-        stage('Tests') {
-            steps {
-                bat "pytest -q"
-            }
-        }
-
-        stage('Build Image') {
-            steps {
-                bat "docker build -t cicd-db-app ."
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                bat '''
-                docker stop cicd-db-app 2>nul || exit 0
-                docker rm cicd-db-app 2>nul || exit 0
-                docker run -d -p 5000:5000 --name cicd-db-app ^
-                    -e DOCKER_ENV=true ^
-                    -e MYSQL_HOST=host.docker.internal ^
-                    -e MYSQL_USER=root ^
-                    -e MYSQL_PASSWORD=pass123 ^
-                    -e MYSQL_DB=cicd ^
-                    cicd-db-app
-                '''
-            }
-        }
-
-        stage('Health Check') {
-            steps {
-                // Add short wait to avoid race condition
-                bat "timeout /t 5"
-
-                bat '''
-                powershell -Command ^
-                    "(Invoke-RestMethod http://localhost:5000/health) | ConvertTo-Json"
-                '''
-            }
-        }
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
     }
 
-    post {
-        failure {
-            echo "Pipeline failed"
-        }
-        success {
-            echo "Pipeline completed successfully!"
-        }
+    stage('Install') {
+      steps {
+        bat 'python -m pip install --upgrade pip'
+        bat 'python -m pip install -r requirements.txt'
+      }
     }
+
+    stage('Lint') {
+      steps {
+        bat 'flake8 .'
+      }
+    }
+
+    stage('Tests') {
+      steps {
+        bat 'pytest -q'
+      }
+    }
+
+    stage('Build Image') {
+      steps {
+        bat 'docker build -t cicd-db-app .'
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        bat 'docker stop cicd-db-app 2>nul || exit 0'
+        bat 'docker rm cicd-db-app 2>nul || exit 0'
+        bat """
+          docker run -d -p 5000:5000 ^
+            --name cicd-db-app ^
+            -e DOCKER_ENV=true ^
+            -e MYSQL_HOST=host.docker.internal ^
+            -e MYSQL_USER=root ^
+            -e MYSQL_PASSWORD=pass123 ^
+            -e MYSQL_DB=cicd ^
+            cicd-db-app
+          """
+      }
+    }
+
+    stage('Health Check') {
+      steps {
+        powershell '(Invoke-RestMethod http://localhost:5000/health) | ConvertTo-Json'
+      }
+    }
+  }
+
+  post {
+    success { echo 'Pipeline success' }
+    failure { echo 'Pipeline failed' }
+  }
 }
