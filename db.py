@@ -69,3 +69,8 @@ def add_task(title):
     conn.commit()
     cur.close()
     conn.close()
+
+
+def get_tasks():
+    """Alias used by app.py and tests."""
+    return get_all_tasks()
