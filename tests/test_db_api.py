@@ -13,4 +13,3 @@ def test_add_task_and_get_tasks():
 
     assert isinstance(tasks, list)
     assert any("Sample Task" in t["title"] for t in tasks)
- 
