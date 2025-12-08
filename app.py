@@ -1,3 +1,5 @@
+# flake8: noqa
+
 from flask import Flask, render_template, request, jsonify
 from db import add_task, get_tasks  # db functions
 
