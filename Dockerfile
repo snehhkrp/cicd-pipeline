@@ -1,59 +1,21 @@
-# FROM python:3.11-slim
-
-# WORKDIR /app
-
-# COPY requirements.txt .
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# COPY . .
-
-# EXPOSE 5000
-
-# CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
-# # Use Gunicorn as the WSGI server to run the Flask application
-
-# ============================================
-
-# FROM python:3.11-slim
-
-# WORKDIR /app
-
-# COPY requirements.txt .
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# COPY . .
-
-# EXPOSE 5000
-
-# # BUILD_VERSION is passed from Jenkins at runtime
-# ENV BUILD_VERSION=local-dev
-
-# CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
-
-
-# ============================================
-
-# FROM python:3.11-slim
-
-# WORKDIR /app
-
-# COPY requirements.txt .
-# RUN python -m pip install --no-cache-dir -r requirements.txt
-
-# COPY . .
-
-# EXPOSE 5000
-
-# CMD ["python", "app.py"]
+# Use the official Python slim image from Docker Hub
 FROM python:3.11-slim
 
+# Set the working directory in the container
 WORKDIR /app
 
+# Copy the requirements.txt file into the container
 COPY requirements.txt .
-RUN python -m pip install --no-cache-dir -r requirements.txt
 
+# Upgrade pip and install dependencies
+RUN python -m pip install --upgrade pip && \
+    python -m pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of your application code
 COPY . .
 
+# Expose the port that the app will run on
 EXPOSE 5000
 
+# Command to run the Flask application using Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
